@@ -1,7 +1,6 @@
 name: Ansible01
 version: 1
 formatVersion: 1
-name: Ansible
 inputs: {}
 resources:
   Cloud_vSphere_Machine_1:
