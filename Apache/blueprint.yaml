@@ -1,0 +1,25 @@
+name: Ansible
+version: 1
+formatVersion: 1
+name: Ansible
+inputs: {}
+resources:
+  Cloud_vSphere_Machine_1:
+    type: Cloud.vSphere.Machine
+    properties:
+      image: CentOS
+      flavor: Small
+      constraints:
+        - tag: CentOS
+  Cloud_Ansible_1:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Cloud_vSphere_Machine_1.*}'
+      osType: linux
+      account: m-s360-ansible
+      username: administrator
+      password: VMware1!
+      inventoryFile: /etc/ansible/hosts
+      playbooks:
+        provision:
+          - /home/administrator/playbook/playbook-apache.yaml
