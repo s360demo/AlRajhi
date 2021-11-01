@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<config-element id="cb60d932-712e-48e7-9df6-60e1e907208f" version="0.0.1">
+  <display-name><![CDATA[User1]]></display-name>
+  <atts>
+    <att name="User1" type="string" read-only="false">
+      <value encoded="n"><![CDATA[]]></value>
+    </att>
+    <att name="User" type="string" read-only="false">
+      <value encoded="n"><![CDATA[justin]]></value>
+    </att>
+  </atts>
+</config-element>
