@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item0" object-name="Workflow:name=generic" id="68df6aef-688a-41c0-b80b-1eb6f81d20fb" editor-version="2.0" version="1.1.1" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
-    <display-name>Copy of Create snapshots of all virtual machines in a resource pool</display-name>
-    <description>Creates a snapshot of each virtual machine in a resource pool.</description>
-    <position y="40.0" x="80.0"/>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item0" object-name="Workflow:name=generic" id="68df6aef-688a-41c0-b80b-1eb6f81d20fb" editor-version="2.0" version="1.1.2" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>snapshots360</display-name>
+    <description>Creates a snapshot of each virtual machine </description>
+    <position y="60.0" x="80.0"/>
     <input>
         <param name="inputProperties" type="Properties"/>
+        <param name="vm" type="VC:VirtualMachine"/>
     </input>
     <output/>
-    <attrib name="allVMs" type="Array/VC:VirtualMachine">
-        <value encoded="n"/>
-        <description>Array of virtual machines </description>
-    </attrib>
-    <attrib name="vmCount" type="number">
-        <value encoded="n">0.0</value>
-        <description>Number of virtual machines in the resource pool</description>
-    </attrib>
-    <attrib name="currentVM" type="number">
-        <value encoded="n">0.0</value>
-        <description>Index of the virtual machine in the array of virtual machines</description>
-    </attrib>
     <attrib name="activeVM" type="VC:VirtualMachine">
         <value encoded="n"/>
         <description>Virtual machine currently being processed</description>
@@ -43,7 +32,7 @@
         <value encoded="n">autoSnapped</value>
         <description>Prefix for the snapshot name</description>
     </attrib>
-    <workflow-item name="item0" out-name="item1" type="task" comparator="0">
+    <workflow-item name="item0" out-name="item6" type="task" comparator="0">
         <display-name>Initialize</display-name>
         <script encoded="false">// Retrieve an array of vms contained in the specified Resource Pool
 if(childResourcePool){
@@ -54,62 +43,17 @@ if(childResourcePool){
 vmCount = allVMs.length;
 currentVM = 0;</script>
         <in-binding>
-            <bind name="resourcePool" type="VC:ResourcePool"/>
-            <bind name="childResourcePool" type="boolean"/>
+            <bind name="activeVM" type="VC:VirtualMachine" export-name="activeVM"/>
         </in-binding>
         <out-binding>
-            <bind name="allVMs" type="Array/VC:VirtualMachine" export-name="allVMs"/>
-            <bind name="vmCount" type="number" export-name="vmCount"/>
-            <bind name="currentVM" type="number" export-name="currentVM"/>
+            <bind name="activeVM" type="VC:VirtualMachine" export-name="activeVM"/>
         </out-binding>
         <position y="100.0" x="40.0"/>
-    </workflow-item>
-    <workflow-item name="item1" out-name="item4" alt-out-name="item2" type="custom-condition" comparator="0">
-        <display-name>VMs to Process?</display-name>
-        <script encoded="false">if(allVMs.length &gt; 0){
-	return true;
-}else{
-	return false;
-}</script>
-        <in-binding>
-            <bind name="allVMs" type="Array/VC:VirtualMachine" export-name="allVMs"/>
-        </in-binding>
-        <out-binding/>
-        <position y="150.0" x="40.0"/>
-    </workflow-item>
-    <workflow-item name="item2" out-name="item3" type="task" comparator="0">
-        <display-name>Scriptable task</display-name>
-        <script encoded="false">System.log("The specified Resource Pool ("+resourcePool.name+") does not appear to have any VMs to process.");</script>
-        <in-binding>
-            <bind name="resourcePool" type="VC:ResourcePool"/>
-        </in-binding>
-        <out-binding/>
-        <position y="220.0" x="40.0"/>
     </workflow-item>
     <workflow-item name="item3" type="end" end-mode="0" comparator="0">
         <in-binding/>
         <out-binding/>
-        <position y="270.0" x="80.0"/>
-    </workflow-item>
-    <workflow-item name="item4" out-name="item6" alt-out-name="item5" type="custom-condition" comparator="0">
-        <display-name>VMs remaining?</display-name>
-        <script encoded="false">System.sleep(2000);
-if (currentVM &lt; vmCount){
-	return true;
-}else{
-	return false;
-}</script>
-        <in-binding>
-            <bind name="currentVM" type="number" export-name="currentVM"/>
-            <bind name="vmCount" type="number" export-name="vmCount"/>
-        </in-binding>
-        <out-binding/>
-        <position y="150.0" x="200.0"/>
-    </workflow-item>
-    <workflow-item name="item5" type="end" end-mode="0" comparator="0">
-        <in-binding/>
-        <out-binding/>
-        <position y="270.0" x="240.0"/>
+        <position y="90.0" x="540.0"/>
     </workflow-item>
     <workflow-item name="item6" out-name="item8" type="task" comparator="0">
         <display-name>Set VM</display-name>
@@ -120,9 +64,8 @@ var date = new Date();
 
 snapName = snapNamePrefix + " " + date.toGMTString();</script>
         <in-binding>
-            <bind name="allVMs" type="Array/VC:VirtualMachine" export-name="allVMs"/>
-            <bind name="currentVM" type="number" export-name="currentVM"/>
             <bind name="snapNamePrefix" type="string" export-name="snapNamePrefix"/>
+            <bind name="vm" type="VC:VirtualMachine" export-name="vm"/>
         </in-binding>
         <out-binding>
             <bind name="activeVM" type="VC:VirtualMachine" export-name="activeVM"/>
@@ -130,7 +73,7 @@ snapName = snapNamePrefix + " " + date.toGMTString();</script>
         </out-binding>
         <position y="160.0" x="360.0"/>
     </workflow-item>
-    <workflow-item name="item8" out-name="item9" catch-name="item10" throw-bind-name="errorCode" type="link" linked-workflow-id="BD80808080808080808080808080808053C180800122528313869552e41805bb1" comparator="0">
+    <workflow-item name="item8" out-name="item6" catch-name="item3" throw-bind-name="errorCode" type="link" linked-workflow-id="BD80808080808080808080808080808053C180800122528313869552e41805bb1" comparator="0">
         <display-name>Create a Snapshot</display-name>
         <in-binding>
             <bind name="vm" type="VC:VirtualMachine" export-name="activeVM">
@@ -155,24 +98,9 @@ snapName = snapNamePrefix + " " + date.toGMTString();</script>
             </bind>
         </out-binding>
         <description>Create a snapshot and return it.</description>
-        <position y="100.0" x="360.0"/>
+        <position y="100.0" x="380.0"/>
     </workflow-item>
-    <workflow-item name="item9" out-name="item4" type="task" comparator="0">
-        <display-name>Increment Counter</display-name>
-        <script encoded="false">currentVM++;
-activeVM = allVMs[currentVM];
-System.sleep(2000);</script>
-        <in-binding>
-            <bind name="allVMs" type="Array/VC:VirtualMachine" export-name="allVMs"/>
-            <bind name="currentVM" type="number" export-name="currentVM"/>
-        </in-binding>
-        <out-binding>
-            <bind name="currentVM" type="number" export-name="currentVM"/>
-            <bind name="activeVM" type="VC:VirtualMachine" export-name="activeVM"/>
-        </out-binding>
-        <position y="100.0" x="200.0"/>
-    </workflow-item>
-    <workflow-item name="item10" out-name="item9" catch-name="" type="task" comparator="0">
+    <workflow-item name="item10" out-name="item6" catch-name="" type="task" comparator="0">
         <display-name>Ignore error if no change before last snapshot</display-name>
         <script encoded="false">// Ignore error if no change before last snapshot
 if (errorCode == "Task 'CreateSnapshot_Task' error: Snapshot not taken since the state of the virtual machine has not changed since the last snapshot operation. (Dynamic Script Module name : vim3WaitTaskEnd#20)") {
